@@ -260,7 +260,7 @@ cdef class Buffer:
     cdef unsigned char * _buff
     cdef int _position
     cdef Buffer _parent
-    cdef int capacity
+    cdef int _capacity
     cdef int _limit
     
     def __cinit__(self, int capacity, Buffer parent = None):
@@ -272,12 +272,12 @@ cdef class Buffer:
             self._buff = parent._buff
             self._position = parent._position
             self._limit = parent._limit
-            self.capacity = parent.capacity
+            self._capacity = parent._capacity
         else:
             #normal constructor
             self._parent = None
-            self.capacity = capacity
-            self._buff = <unsigned char *>(calloc(1, self.capacity))
+            self._capacity = capacity
+            self._buff = <unsigned char *>(calloc(1, self._capacity))
         
     def __dealloc__(self):
         if self._parent is None:
@@ -289,6 +289,7 @@ cdef class Buffer:
         """Create a new empty buffer with the given *capacity*."""
         self.clear()
 
+    
     def duplicate(self):
         """Return a shallow copy of the Buffer, e.g. the copied buffer 
         references the same bytes as the original buffer, but has its own
@@ -302,15 +303,15 @@ cdef class Buffer:
             raise BufferInvalidArgumentError("length must be >= 0")
         if src_start < 0:
             raise BufferInvalidArgumentError("src start must be >= 0")
-        if src_start > src.capacity:
+        if src_start > src._capacity:
             raise BufferInvalidArgumentError("src start must <= src capacity")
-        if src_start + length > src.capacity:
+        if src_start + length > src._capacity:
             raise BufferInvalidArgumentError("src start + length must <= src capacity")
         if dst_start < 0:
             raise BufferInvalidArgumentError("dst start must be >= 0")
-        if dst_start > self.capacity:
+        if dst_start > self._capacity:
             raise BufferInvalidArgumentError("dst start must <= dst capacity")
-        if dst_start + length > self.capacity:
+        if dst_start + length > self._capacity:
             raise BufferInvalidArgumentError("dst start + length must <= dst capacity")
         #now we can safely copy!
         memcpy(self._buff + dst_start, src._buff + src_start, length)        
@@ -318,7 +319,7 @@ cdef class Buffer:
     def clear(self):
         """Prepares the buffer for relative read operations. The buffers :attr:`limit` will set to the buffers :attr:`capacity` and
         its :attr:`position` will be set to 0."""
-        self._limit = self.capacity
+        self._limit = self._capacity
         self._position = 0
 
     def flip(self):
@@ -346,6 +347,11 @@ cdef class Buffer:
     cdef int _remaining(self):
         return self._limit - self._position
 
+
+    property capacity:
+        def __get__(self):
+            return self._capacity
+            
     property remaining:
         def __get__(self):
             return self._limit - self._position
@@ -355,12 +361,12 @@ cdef class Buffer:
             return self._limit
         
         def __set__(self, limit):
-            if limit >= 0 and limit <= self.capacity and limit >= self._position:
+            if limit >= 0 and limit <= self._capacity and limit >= self._position:
                 self._limit = limit
             else:
                 if limit < 0:
                     raise BufferInvalidArgumentError("limit must be >= 0")
-                elif limit > self.capacity:
+                elif limit > self._capacity:
                     raise BufferInvalidArgumentError("limit must be <= capacity")
                 elif limit < self._position:
                     raise BufferInvalidArgumentError("limit must be >= position")
@@ -372,12 +378,12 @@ cdef class Buffer:
             return self._position
         
         def __set__(self, position):
-            if position >= 0 and position <= self.capacity and position <= self._limit:
+            if position >= 0 and position <= self._capacity and position <= self._limit:
                 self._position = position
             else:
                 if position < 0:
                     raise BufferInvalidArgumentError("position must be >= 0")
-                elif position > self.capacity:
+                elif position > self._capacity:
                     raise BufferInvalidArgumentError("position must be <= capacity")
                 elif position > self._limit:
                     raise BufferInvalidArgumentError("position must be <= limit")
@@ -434,17 +440,17 @@ cdef class Buffer:
             else:
                 memmove(self._buff + 0, self._buff + self._position, n)
         self._position = n
-        self._limit = self.capacity
+        self._limit = self._capacity
 
     def __getitem__(self, object i):
         cdef int start, end, stride
         if type(i) == types.IntType:
-            if i >= 0 and i < self.capacity:
+            if i >= 0 and i < self._capacity:
                 return self._buff[i]
             else:        
                 raise BufferInvalidArgumentError("index must be >= 0 and < capacity")
         elif type(i) == types.SliceType:
-            start, end, stride = i.indices(self.capacity)
+            start, end, stride = i.indices(self._capacity)
             return PyString_FromStringAndSize(<char *>(self._buff + start), end - start)
         else:
             raise BufferInvalidArgumentError("wrong index type")
@@ -458,12 +464,12 @@ cdef class Buffer:
                 raise BufferInvalidArgumentError("value must be integer")
             if value < 0 or value > 255:
                 raise BufferInvalidArgumentError("value must in range [0..255]")
-            if i >= 0 and i < self.capacity:
+            if i >= 0 and i < self._capacity:
                 self._buff[i] = value
             else:
                 raise BufferInvalidArgumentError("index must be >= 0 and < capacity")
         elif type(i) == types.SliceType:
-            start, end, stride = i.indices(self.capacity)
+            start, end, stride = i.indices(self._capacity)
             PyString_AsStringAndSize(value, &b, &n)
             if n != (end - start):
                 raise BufferInvalidArgumentError("incompatible slice")
@@ -606,13 +612,13 @@ cdef class Buffer:
 
         import string
 
-        out.write('<concurrence.io.Buffer id=%x, position=%d, limit=%d, capacity=%d>\n' % (id(self), self.position, self.limit, self.capacity))
+        out.write('<concurrence.io.Buffer id=%x, position=%d, limit=%d, capacity=%d>\n' % (id(self), self.position, self.limit, self._capacity))
         printable = set(string.printable)
         whitespace = set(string.whitespace)
         x = 0
         s1 = []
         s2 = []
-        while x < self.capacity:
+        while x < self._capacity:
             v = self[x]
             if x < self.position:
                 s1.append('%s%02x%s' % (highlight1, v, default))
@@ -715,7 +721,7 @@ cdef class PacketReader:
                 #return self.length < r #if l was smaller, tere is more, otherwise l == r and buffer is empty                   
             else:
                 #print 'incomplete packet in buffer', buffer._position, self.length 
-                if self.length > buffer.capacity:
+                if self.length > buffer._capacity:
                     #print 'start of oversize packet', self.length
                     self.start = buffer._position - 4
                     self.end = buffer._limit
@@ -762,9 +768,9 @@ cdef class PacketReader:
             elif (r & PACKET_READ_START) and not (r & PACKET_READ_END):
                 #print 'start of oversize', self.end - self.start, self.length
                 #first create oversize_packet if necessary:
-                if self.oversize_packet.capacity < self.length:
+                if self.oversize_packet._capacity < self.length:
                     #find first size multiple of 2 that will fit the oversize packet
-                    size = self.buffer.capacity
+                    size = self.buffer._capacity
                     while size < self.length:
                         size = size * 2
                     if size >= MAX_PACKET_SIZE:
