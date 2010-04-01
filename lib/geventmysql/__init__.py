@@ -14,6 +14,7 @@ import logging
 import exceptions
 
 import gevent
+TaskletExit = gevent.GreenletExit
 
 from datetime import datetime, date
 from geventmysql import client
