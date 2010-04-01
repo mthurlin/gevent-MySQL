@@ -276,7 +276,7 @@ class Connection(object):
             assert self.state == self.STATE_INIT, "make sure connection is not already connected or closed"
 
             self.state = self.STATE_CONNECTING
-            self.socket = socket.create_connection(addr, timeout=3)          
+            self.socket = socket.create_connection(addr)          
             
             self.reader = BufferedPacketReader(self.socket, self.buffer)
             self.writer = BufferedPacketWriter(self.socket, self.buffer)
