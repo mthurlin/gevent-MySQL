@@ -1,0 +1,17 @@
+:: Description ::
+A gevent (http://www.gevent.org) adaption of the asynchronous MySQL driver from 
+the Concurrence framework (http://opensource.hyves.org/concurrence).
+
+:: Requirements ::
+Requires Cython and gevent.
+
+:: Installation ::
+python setup.py install
+
+:: Usage ::
+See examples/
+
+:: Author ::
+Adaptation to gevent: Markus Thurlin (markus@softbasic.se)
+Original: Henk Punt
+
