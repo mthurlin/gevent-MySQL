@@ -297,9 +297,9 @@ class Connection(object):
             self.set_use_unicode(use_unicode)
 
             return self
-        #except TimeoutError: TODO
-        #    self.state = self.STATE_INIT
-        #    raise
+        except gevent.Timeout:
+            self.state = self.STATE_INIT
+            raise
         except ClientLoginError:
             self.state = self.STATE_INIT
             raise
