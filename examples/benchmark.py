@@ -19,11 +19,8 @@ def task():
    
     
 start = curtime()
-t = []
-for i in range(C):
-    t.append(gevent.spawn(task))
-    
-gevent.joinall(t)
+
+gevent.joinall([gevent.spawn(task) for i in range(C)])
 
 elapsed = curtime() - start
 num = C * N
