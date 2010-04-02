@@ -66,28 +66,12 @@ class Cursor(object):
         self.lastrowid = None
         self.rowcount = -1
         
-    def _escape_string(self, s):
+    def _escape_string(self, s, replace = {'\0': '\\0', '\n': '\\n', '\r': '\\r', '\\': '\\\\', "'": "\\'", '"': '\\"', '\x1a': '\\Z'}):
         """take from mysql src code:"""
-        #TODO how fast is this?, do this in C/pyrex?
-        escaped = []
-        for ch in s:
-            if ch == '\0':
-                escaped.append('\\0')
-            elif ch == '\n':
-                escaped.append('\\n')
-            elif ch == '\r':
-                escaped.append('\\r')
-            elif ch == '\\':
-                escaped.append('\\\\')
-            elif ch == "'": #single quote
-                escaped.append("\\'")
-            elif ch == '"': #double quote
-                escaped.append('\\"')
-            elif ch == '\x1a': #EOF on windows
-                escaped.append('\\Z')
-            else:
-                escaped.append(ch)
-        return ''.join(escaped)
+        #TODO how fast is this?, do this in C/pyrex?        
+        get = replace.get
+        return "".join([get(ch, ch) for ch in s])
+
             
     def _wrap_exception(self, e, msg):
         self.log.exception(msg)
