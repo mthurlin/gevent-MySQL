@@ -258,11 +258,11 @@ class Connection(object):
             self.state = self.STATE_ERROR
             raise
 
-    def connect(self, host = "localhost", port = 3306, user = "", passwd = "", db = "", autocommit = None, charset = None, use_unicode=False):
-        """connects to the given host and port with user and passwd"""
-        #self.log.debug("connect mysql client %s %s %s %s %s", id(self), host, port, user, passwd)
+    def connect(self, host = "localhost", port = 3306, user = "", password = "", db = "", autocommit = None, charset = None, use_unicode=False):
+        """connects to the given host and port with user and password"""
+        #self.log.debug("connect mysql client %s %s %s %s %s", id(self), host, port, user, password)
         try:
-            #print 'connect', host, user, passwd, db
+            #print 'connect', host, user, password, db
             #parse addresses of form str <host:port>
             if type(host) == str:
                 if host[0] == '/': #assume unix domain socket
@@ -281,7 +281,7 @@ class Connection(object):
             
             self.reader = BufferedPacketReader(self.socket, self.buffer)
             self.writer = BufferedPacketWriter(self.socket, self.buffer)
-            self._handshake(user, passwd, db, charset)
+            self._handshake(user, password, db, charset)
             #handshake complete client can now send commands
             self.state = self.STATE_CONNECTED
 

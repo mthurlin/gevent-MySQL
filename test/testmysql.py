@@ -21,7 +21,7 @@ class TestMySQL(unittest.TestCase):
 
     def testMySQLClient(self):
         cnn = client.connect(host = DB_HOST, user = DB_USER,
-                             passwd = DB_PASSWD, db = DB_DB)
+                             password = DB_PASSWD, db = DB_DB)
 
         rs = cnn.query("select 1")
 
@@ -31,7 +31,7 @@ class TestMySQL(unittest.TestCase):
         cnn.close()
 
     def testConnectNoDb(self):
-        cnn = client.connect(host = DB_HOST, user = DB_USER, passwd = DB_PASSWD)
+        cnn = client.connect(host = DB_HOST, user = DB_USER, password = DB_PASSWD)
 
         rs = cnn.query("select 1")
 
@@ -43,7 +43,7 @@ class TestMySQL(unittest.TestCase):
 
     def testMySQLClient2(self):
         cnn = client.connect(host = DB_HOST, user = DB_USER,
-                             passwd = DB_PASSWD, db = DB_DB)
+                             password = DB_PASSWD, db = DB_DB)
 
         cnn.query("truncate tbltest")
 
@@ -68,7 +68,7 @@ class TestMySQL(unittest.TestCase):
 
     def testMySQLTimeout(self):
         cnn = client.connect(host = DB_HOST, user = DB_USER,
-                             passwd = DB_PASSWD, db = DB_DB)
+                             password = DB_PASSWD, db = DB_DB)
 
         rs = cnn.query("select sleep(2)")
         list(rs)
@@ -92,7 +92,7 @@ class TestMySQL(unittest.TestCase):
 
         def query(s):
             cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                                passwd = DB_PASSWD, db = DB_DB)
+                                password = DB_PASSWD, db = DB_DB)
             cur = cnn.cursor()
             cur.execute("select sleep(%d)" % s)
             cur.close()
@@ -110,7 +110,7 @@ class TestMySQL(unittest.TestCase):
     def testMySQLDBAPI(self):
 
         cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                            passwd = DB_PASSWD, db = DB_DB)
+                            password = DB_PASSWD, db = DB_DB)
 
         cur = cnn.cursor()
 
@@ -150,7 +150,7 @@ class TestMySQL(unittest.TestCase):
 
     def testLargePackets(self):
         cnn = client.connect(host = DB_HOST, user = DB_USER,
-                             passwd = DB_PASSWD, db = DB_DB)
+                             password = DB_PASSWD, db = DB_DB)
 
 
         cnn.query("truncate tbltest")
@@ -183,7 +183,7 @@ class TestMySQL(unittest.TestCase):
         _mysql.MAX_PACKET_SIZE = 1024 * 4
 
         cnn = client.connect(host = DB_HOST, user = DB_USER,
-                             passwd = DB_PASSWD, db = DB_DB)
+                             password = DB_PASSWD, db = DB_DB)
 
         try:
             rs = cnn.query("select test_id, test_blob from tbltest")
@@ -202,7 +202,7 @@ class TestMySQL(unittest.TestCase):
 
     def testEscapeArgs(self):
         cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                            passwd = DB_PASSWD, db = DB_DB)
+                            password = DB_PASSWD, db = DB_DB)
 
         cur = cnn.cursor()
 
@@ -249,7 +249,7 @@ class TestMySQL(unittest.TestCase):
 
 
         cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                            passwd = DB_PASSWD, db = DB_DB,
+                            password = DB_PASSWD, db = DB_DB,
                             charset = 'latin-1', use_unicode = True)
 
         cur = cnn.cursor()
@@ -279,7 +279,7 @@ class TestMySQL(unittest.TestCase):
     def testAutoInc(self):
 
         cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                            passwd = DB_PASSWD, db = DB_DB)
+                            password = DB_PASSWD, db = DB_DB)
 
         cur = cnn.cursor()
 
@@ -447,7 +447,7 @@ class TestMySQL(unittest.TestCase):
         BIGNUM = 112233445566778899
 
         cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                            passwd = DB_PASSWD, db = DB_DB,
+                            password = DB_PASSWD, db = DB_DB,
                             charset = 'latin-1', use_unicode = True)
 
         cur = cnn.cursor()
@@ -480,7 +480,7 @@ class TestMySQL(unittest.TestCase):
         d_string = "2010-02-11"
 
         cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                            passwd = DB_PASSWD, db = DB_DB,
+                            password = DB_PASSWD, db = DB_DB,
                             charset = 'latin-1', use_unicode = True)
 
         cur = cnn.cursor()
@@ -507,7 +507,7 @@ class TestMySQL(unittest.TestCase):
         d_string = "2010-02-11 13:37:42"
 
         cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                            passwd = DB_PASSWD, db = DB_DB,
+                            password = DB_PASSWD, db = DB_DB,
                             charset = 'latin-1', use_unicode = True)
 
         cur = cnn.cursor()
@@ -535,7 +535,7 @@ class TestMySQL(unittest.TestCase):
 
 
         cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                            passwd = DB_PASSWD, db = DB_DB,
+                            password = DB_PASSWD, db = DB_DB,
                             charset = 'latin-1', use_unicode = True)
 
         cur = cnn.cursor()
@@ -555,7 +555,7 @@ class TestMySQL(unittest.TestCase):
         peacesign_utf8 = "\xe2\x98\xae"
 
         cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                            passwd = DB_PASSWD, db = DB_DB,
+                            password = DB_PASSWD, db = DB_DB,
                             charset = 'utf-8', use_unicode = True)
 
         cur = cnn.cursor()
@@ -578,7 +578,7 @@ class TestMySQL(unittest.TestCase):
 
 
         cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
-                            passwd = DB_PASSWD, db = DB_DB,
+                            password = DB_PASSWD, db = DB_DB,
                             charset = 'utf8', use_unicode = True)
 
         cur = cnn.cursor()
