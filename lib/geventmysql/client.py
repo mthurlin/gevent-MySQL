@@ -12,6 +12,7 @@ from geventmysql.mysql import BufferedPacketReader, BufferedPacketWriter, PACKET
 import logging
 import time
 from gevent import socket
+import gevent
 
 # From query: SHOW COLLATION;
 charset_map = {}
