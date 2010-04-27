@@ -904,6 +904,11 @@ cdef class PacketReader:
         packet = self.packet
         if packet._position + 1 > packet._limit: raise BufferUnderflowError()
         n = packet._buff[packet._position]
+
+        if n == 251:
+            packet._position = packet._position + 1
+            return None
+        
         packet._position = packet._position + 1
         s = PyString_FromStringAndSize(<char *>(packet._buff + packet._position), n)
         packet._position = packet._position + n
@@ -950,7 +955,7 @@ cdef class PacketReader:
             encoding = self.encoding
         else:
             decode = 0
-         
+
         r = self._read_packet()
         if r & PACKET_READ_END: #whole packet recv                    
             if self.packet._buff[self.packet._position] == 0xFE: 
@@ -983,6 +988,7 @@ cdef class PacketReader:
                         row[i] = self._datestring_to_datetime(self._read_datestring())
                     else:
                         row[i] = self._read_bytes_length_coded()
+
                     i = i + 1
         return r
     
@@ -994,6 +1000,7 @@ cdef class PacketReader:
         rows = []
         row = [None] * field_count
         add = rows.append
+        #print "Reading fields", len(fields)
         while i < row_count:
             r = self._read_row(row, fields, field_count)
             if r & PACKET_READ_END:
