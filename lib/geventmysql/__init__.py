@@ -68,7 +68,7 @@ class Cursor(object):
         
     def _escape_string(self, s, replace = {'\0': '\\0', '\n': '\\n', '\r': '\\r', '\\': '\\\\', "'": "\\'", '"': '\\"', '\x1a': '\\Z'}):
         """take from mysql src code:"""
-        #TODO how fast is this?, do this in C/pyrex?        
+        #TODO how fast is this?, do this in C/pyrex?
         get = replace.get
         return "".join([get(ch, ch) for ch in s])
 
@@ -82,35 +82,34 @@ class Cursor(object):
         
     def execute(self, qry, args = []):
         #print repr(qry),  repr(args), self.connection.charset
-        
         if self.closed:
             raise ProgrammingError('this cursor is already closed')
 
         if type(qry) == unicode:
             #we will only communicate in 8-bits with mysql
             qry = qry.encode(self.connection.charset)
-            
+
         try:
             self._close_result() #close any previous result if needed
             #substitute arguments
+            params = []
             for arg in args:
                 if type(arg) == str:
-                    qry = qry.replace('%s', "'%s'" % self._escape_string(arg), 1)
+                    params.append("'%s'" % self._escape_string(arg))
                 elif type(arg) == unicode:
-                    qry = qry.replace('%s', "'%s'" % self._escape_string(arg).encode(self.connection.charset), 1)
-                elif type(arg) == int:
-                    qry = qry.replace('%s', str(arg), 1)
-                elif type(arg) == long:
-                    qry = qry.replace('%s', str(arg), 1)
+                    params.append("'%s'" % self._escape_string(arg).encode(self.connection.charset))
+                elif isinstance(arg, (int, long, float)):
+                    params.append(str(arg))
                 elif arg is None:
-                    qry = qry.replace('%s', 'null', 1)
+                    params.append('null')
                 elif isinstance(arg, datetime):
-                    qry = qry.replace('%s', "'%s'" % arg.strftime('%Y-%m-%d %H:%M:%S'), 1)
+                    params.append("'%s'" % arg.strftime('%Y-%m-%d %H:%M:%S'))
                 elif isinstance(arg, date):
-                    qry = qry.replace('%s', "'%s'" % arg.strftime('%Y-%m-%d'), 1)
+                    params.append("'%s'" % arg.strftime('%Y-%m-%d'))
                 else:
                     assert False, "unknown argument type: %s %s" % (type(arg), repr(arg))
-            
+
+            qry = qry % tuple(params)
             result = self.connection.client.query(qry)
             
             #process result if nescecary
