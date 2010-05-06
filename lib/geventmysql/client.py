@@ -5,10 +5,9 @@
 
 #TODO supporting closing a halfread resultset (e.g. automatically read and discard rest)
 
-
+import errno
 from geventmysql._mysql import Buffer
 from geventmysql.mysql import BufferedPacketReader, BufferedPacketWriter, PACKET_READ_RESULT, CAPS, COMMAND
-
 import logging
 import time
 from gevent import socket
@@ -344,6 +343,14 @@ class Connection(object):
             else: #result set
                 self.current_resultset = ResultSet(self, result)
                 return self.current_resultset
+                
+        except socket.error, e:
+            (errorcode, errorstring) = e
+
+            if errorcode in [errno.ECONNABORTED, errno.ECONNREFUSED, errno.ECONNRESET]:
+                self._incommand = False
+                self.close()
+            raise
         finally:
             self._incommand = False
 
