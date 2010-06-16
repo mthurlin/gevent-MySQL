@@ -343,11 +343,11 @@ class Connection(object):
             else: #result set
                 self.current_resultset = ResultSet(self, result)
                 return self.current_resultset
-                
+
         except socket.error, e:
             (errorcode, errorstring) = e
 
-            if errorcode in [errno.ECONNABORTED, errno.ECONNREFUSED, errno.ECONNRESET]:
+            if errorcode in [errno.ECONNABORTED, errno.ECONNREFUSED, errno.ECONNRESET, errno.EPIPE, errno.WSAECONNABORTED]:
                 self._incommand = False
                 self.close()
             raise
