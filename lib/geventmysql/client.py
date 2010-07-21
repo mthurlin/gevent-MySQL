@@ -261,17 +261,17 @@ class Connection(object):
         """connects to the given host and port with user and password"""
         #self.log.debug("connect mysql client %s %s %s %s %s", id(self), host, port, user, password)
         try:
-            #print 'connect', host, user, password, db
             #parse addresses of form str <host:port>
-            if type(host) == str:
-                if host[0] == '/': #assume unix domain socket
-                    addr = host
-                elif ':' in host:
-                    host, port = host.split(':')
-                    port = int(port)
-                    addr = (host, port)
-                else:
-                    addr = (host, port)
+            assert type(host) == str, "make sure host is a string"
+
+            if host[0] == '/': #assume unix domain socket
+                addr = host
+            elif ':' in host:
+                host, port = host.split(':')
+                port = int(port)
+                addr = (host, port)
+            else:
+                addr = (host, port)
 
             assert self.state == self.STATE_INIT, "make sure connection is not already connected or closed"
 
