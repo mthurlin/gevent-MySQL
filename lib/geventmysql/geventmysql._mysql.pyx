@@ -849,6 +849,25 @@ cdef class PacketReader:
                 if packet._position + 2 > packet._limit: raise  BufferUnderflowError()
                 n = packet._buff[packet._position + 1] | ((packet._buff[packet._position + 2]) << 8)  
                 w = 3
+            elif n == 253:
+                #24 bit word
+                if packet._position + 4 > packet._limit: raise  BufferUnderflowError()
+                n = packet._buff[packet._position + 1] | ((packet._buff[packet._position + 2]) << 8) | ((packet._buff[packet._position + 3]) << 16)
+                w = 4
+            elif n == 254:
+                #64 bit word
+                if packet._position + 9 > packet._limit: raise  BufferUnderflowError()
+                n = 0
+                n |= (<unsigned long long>packet._buff[packet._position + 1]) << 0
+                n |= (<unsigned long long>packet._buff[packet._position + 2]) << 8
+                n |= (<unsigned long long>packet._buff[packet._position + 3]) << 16
+                n |= (<unsigned long long>packet._buff[packet._position + 4]) << 24
+                n |= (<unsigned long long>packet._buff[packet._position + 5]) << 32
+                n |= (<unsigned long long>packet._buff[packet._position + 6]) << 40
+                n |= (<unsigned long long>packet._buff[packet._position + 7]) << 48
+                n |= (<unsigned long long>packet._buff[packet._position + 8]) << 56
+                w = 9
+           
             else:
                 assert False, 'not implemented yet, n: %02x' % n
         
