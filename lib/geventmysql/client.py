@@ -12,6 +12,7 @@ import logging
 import time
 from gevent import socket
 import gevent
+import sys
 
 # From query: SHOW COLLATION;
 charset_map = {}
@@ -347,9 +348,15 @@ class Connection(object):
         except socket.error, e:
             (errorcode, errorstring) = e
 
-            if errorcode in [errno.ECONNABORTED, errno.ECONNREFUSED, errno.ECONNRESET, errno.EPIPE, errno.WSAECONNABORTED]:
+            if errorcode in [errno.ECONNABORTED, errno.ECONNREFUSED, errno.ECONNRESET, errno.EPIPE]:
                 self._incommand = False
                 self.close()
+
+            if sys.platform == "win32":
+                if errorcode in [errno.WSAECONNABORTED]:
+                    self._incommand = False
+                    self.close()
+
             raise
         finally:
             self._incommand = False
