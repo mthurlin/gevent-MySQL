@@ -995,7 +995,8 @@ cdef class PacketReader:
                         if row[i] is not None and (self.encoding or self.use_unicode):
                             bytes = fields[i][2]
                             nr = ord(bytes[1]) << 8 | ord(bytes[0])
-                            row[i] = row[i].decode(charset_nr[nr])
+                            if charset_nr[nr] != 'binary':
+                                row[i] = row[i].decode(charset_nr[nr])
                             if not self.use_unicode:
                                 row[i] = row[i].encode(self.encoding)
 
