@@ -602,7 +602,47 @@ class TestMySQL(unittest.TestCase):
             result = cur.fetchall()
             self.assertEquals(result, expected)
 
+    def testBinary(self):
+        peacesign_binary = "\xe2\x98\xae"
+        peacesign_binary2 = "\xe2\x98\xae" * 10
 
+        cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
+                            password = DB_PASSWD, db = DB_DB,
+                            charset = 'latin-1', use_unicode = True)
+
+        cur = cnn.cursor()
+        cur.execute("drop table if exists tblbin")
+        cur.execute("create table tblbin (test_id int(11) DEFAULT NULL, test_binary VARBINARY(30) DEFAULT NULL) ENGINE=MyISAM DEFAULT CHARSET=utf8")
+
+        cur.execute("insert into tblbin (test_id, test_binary) values (%s, %s)", (1, peacesign_binary))
+        cur.execute("insert into tblbin (test_id, test_binary) values (%s, %s)", (2, peacesign_binary2))
+
+        cur.execute("select test_id, test_binary from tblbin")
+        result = cur.fetchall()
+
+        # We expect binary strings back
+        self.assertEquals([(1, peacesign_binary),(2, peacesign_binary2)], result)
+
+    def testBlob(self):
+        peacesign_binary = "\xe2\x98\xae"
+        peacesign_binary2 = "\xe2\x98\xae" * 1024
+
+        cnn = dbapi.connect(host = DB_HOST, user = DB_USER,
+                            password = DB_PASSWD, db = DB_DB,
+                            charset = 'latin-1', use_unicode = True)
+
+        cur = cnn.cursor()
+        cur.execute("drop table if exists tblblob")
+        cur.execute("create table tblblob (test_id int(11) DEFAULT NULL, test_blob BLOB DEFAULT NULL) ENGINE=MyISAM DEFAULT CHARSET=utf8")
+
+        cur.execute("insert into tblblob (test_id, test_blob) values (%s, %s)", (1, peacesign_binary))
+        cur.execute("insert into tblblob (test_id, test_blob) values (%s, %s)", (2, peacesign_binary2))
+
+        cur.execute("select test_id, test_blob from tblblob")
+        result = cur.fetchall()
+
+        # We expect binary strings back
+        self.assertEquals([(1, peacesign_binary),(2, peacesign_binary2)], result)
 
 
 
