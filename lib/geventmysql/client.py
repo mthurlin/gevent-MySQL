@@ -190,6 +190,8 @@ class Connection(object):
         #always turn off compression
         client_caps &= ~CAPS.COMPRESS
         client_caps &= ~CAPS.NO_SCHEMA
+        #always turn off ssl
+        client_caps &= ~CAPS.SSL
 
         if not server_caps & CAPS.CONNECT_WITH_DB and database:
             assert False, "initial db given but not supported by server"
