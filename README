@@ -1,17 +1,22 @@
-:: Description ::
+# PLEASE NOTE
+I am no longer maintaining this driver.
+Please use https://github.com/esnme/amysql instead. 
+
+
+### Description
 A gevent (http://www.gevent.org) adaption of the asynchronous MySQL driver from 
 the Concurrence framework (http://opensource.hyves.org/concurrence).
 
-:: Requirements ::
+### Requirements
 Requires Cython and gevent.
 
-:: Installation ::
+### Installation
 python setup.py install
 
-:: Usage ::
+### Usage
 See examples/
 
-:: Author ::
+### Author
 Adaptation to gevent: Markus Thurlin (markus@softbasic.se)
 Original: Henk Punt
 
